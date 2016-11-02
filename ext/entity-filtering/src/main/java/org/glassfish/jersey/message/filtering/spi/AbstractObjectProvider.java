@@ -85,7 +85,7 @@ public abstract class AbstractObjectProvider<T> implements ObjectProvider<T>, Ob
         return getFilteringObject(FilteringHelper.getEntityClass(genericType), forWriter, annotations);
     }
 
-    private T getFilteringObject(final Class<?> entityClass, final boolean forWriter, final Annotation... annotations) {
+    protected T getFilteringObject(final Class<?> entityClass, final boolean forWriter, final Annotation... annotations) {
         if (FilteringHelper.filterableEntityClass(entityClass)) {
             // Inspect.
             entityInspector.inspect(entityClass, forWriter);

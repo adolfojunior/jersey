@@ -40,6 +40,7 @@
 
 package org.glassfish.jersey.jackson.internal;
 
+import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +65,19 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
  * @author Michal Gajdos
  */
 final class JacksonObjectProvider extends AbstractObjectProvider<FilterProvider> {
+
+    @Override
+    protected FilterProvider getFilteringObject(final Class<?> entityClass,
+                                                final boolean forWriter,
+                                                final Annotation... annotations) {
+        FilterProvider filterProvider = super
+            .getFilteringObject(entityClass, forWriter, annotations);
+        if (filterProvider instanceof FilteringFilterProvider) {
+            // return always a new instance with a new stack.
+            return new FilteringFilterProvider((FilteringFilterProvider) filterProvider);
+        }
+        return filterProvider;
+    }
 
     @Override
     public FilterProvider transform(final ObjectGraph graph) {
@@ -138,6 +152,10 @@ final class JacksonObjectProvider extends AbstractObjectProvider<FilterProvider>
 
         private final FilteringPropertyFilter root;
         private final Stack<FilteringPropertyFilter> stack = new Stack<>();
+
+        public FilteringFilterProvider(final FilteringFilterProvider filterProvider) {
+            this.root = filterProvider.root;
+        }
 
         public FilteringFilterProvider(final FilteringPropertyFilter root) {
             this.root = root;
